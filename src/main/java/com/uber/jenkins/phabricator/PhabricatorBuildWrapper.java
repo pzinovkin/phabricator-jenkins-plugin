@@ -258,7 +258,7 @@ public class PhabricatorBuildWrapper extends BuildWrapper {
         String subdirValue = environment.get(getSubdirParameter());
         logger.println("Using subdirectory " + subdirValue);
         for (DirectoryMapping mapping : subdirMap) {
-            if (subdirValue == mapping.from) {
+            if (subdirValue.equals(mapping.from)) {
                 return workspace.child(mapping.to);
             }
         }
