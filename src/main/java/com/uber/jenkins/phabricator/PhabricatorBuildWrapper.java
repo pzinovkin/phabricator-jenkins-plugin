@@ -23,9 +23,10 @@ package com.uber.jenkins.phabricator;
 import com.uber.jenkins.phabricator.conduit.ArcanistClient;
 import com.uber.jenkins.phabricator.conduit.ArcanistUsageException;
 import com.uber.jenkins.phabricator.conduit.Differential;
-import com.uber.jenkins.phabricator.utils.CommonUtils;
 import com.uber.jenkins.phabricator.conduit.DifferentialClient;
+import com.uber.jenkins.phabricator.utils.CommonUtils;
 import hudson.EnvVars;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
@@ -41,13 +42,18 @@ public class PhabricatorBuildWrapper extends BuildWrapper {
     private final boolean applyToMaster;
     private final boolean uberDotArcanist;
     private final boolean showBuildStartedMessage;
+    private final String subdirParameter;
+    private final List<DirectoryMapping> subdirMap;
 
     @DataBoundConstructor
-    public PhabricatorBuildWrapper(boolean createCommit, boolean applyToMaster, boolean uberDotArcanist, boolean showBuildStartedMessage) {
+    public PhabricatorBuildWrapper(boolean createCommit, boolean applyToMaster, boolean uberDotArcanist,
+                                   boolean showBuildStartedMessage, String subdirParameter, List<DirectoryMapping> subdirMap) {
         this.createCommit = createCommit;
         this.applyToMaster = applyToMaster;
         this.uberDotArcanist = uberDotArcanist;
         this.showBuildStartedMessage = showBuildStartedMessage;
+        this.subdirParameter = subdirParameter;
+        this.subdirMap = subdirMap;
     }
 
     @Override
@@ -77,7 +83,8 @@ public class PhabricatorBuildWrapper extends BuildWrapper {
             this.addShortText(build);
             this.ignoreBuild(logger, "No differential ID found.");
         } else {
-            LauncherFactory starter = new LauncherFactory(launcher, environment, listener.getLogger(), build.getWorkspace());
+            FilePath patchDirectory = getPatchDirectory(build, environment, logger);
+            LauncherFactory starter = new LauncherFactory(launcher, environment, logger, patchDirectory);
 
             if (uberDotArcanist) {
                 int npmCode = starter.launch()
@@ -198,6 +205,16 @@ public class PhabricatorBuildWrapper extends BuildWrapper {
         return showBuildStartedMessage;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
+    public List<DirectoryMapping> getSubdirMap() {
+        return subdirMap;
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public String getSubdirParameter() {
+        return subdirParameter;
+    }
+
     public String getPhabricatorURL() {
         return this.getDescriptor().getConduitURL();
     }
@@ -222,5 +239,29 @@ public class PhabricatorBuildWrapper extends BuildWrapper {
     @Override
     public PhabricatorBuildWrapperDescriptor getDescriptor() {
         return (PhabricatorBuildWrapperDescriptor)super.getDescriptor();
+    }
+
+    /**
+     * Find the proper directory to apply the differential to.
+     * @param build the current build
+     * @param environment the environment variables passed to the build
+     * @param logger
+     * @return
+     */
+    public FilePath getPatchDirectory(AbstractBuild build, EnvVars environment, PrintStream logger) {
+        FilePath workspace = build.getWorkspace();
+        if (CommonUtils.isBlank(this.subdirParameter) || CommonUtils.isBlank(environment.get(getSubdirParameter()))) {
+            logger.println("No subdirectory parameter provided");
+            return workspace;
+        }
+
+        String subdirValue = environment.get(getSubdirParameter());
+        logger.println("Using subdirectory " + subdirValue);
+        for (DirectoryMapping mapping : subdirMap) {
+            if (subdirValue == mapping.from) {
+                return workspace.child(mapping.to);
+            }
+        }
+        return workspace.child(subdirValue);
     }
 }

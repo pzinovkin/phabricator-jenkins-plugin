@@ -1,5 +1,4 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-
   <f:entry title="Create git commit" field="createCommit"
            description="Create a git commit with the patch">
       <f:checkbox />
@@ -16,4 +15,16 @@
            description="Shows the 'Build Started:' information message in Phabricator.">
       <f:checkbox default="true" />
   </f:entry>
+
+  <f:advanced>
+    <f:entry title="Subdirectory parameter" field="subdirParameter"
+            description="Read subdirectory from this parameter">
+      <f:textbox />
+    </f:entry>
+
+    <f:entry title="Map subdirectory parameter to directory" field="subdirMap"
+            description="Optionally map the 'Subdirectory parameter' to concrete directory. Useful if the subdirectory parameter is a callsign.">
+      <f:repeatableProperty field="subdirMap" />
+    </f:entry>
+  </f:advanced>
 </j:jelly>

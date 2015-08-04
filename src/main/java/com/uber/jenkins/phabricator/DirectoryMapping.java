@@ -20,36 +20,25 @@
 
 package com.uber.jenkins.phabricator;
 
-import com.uber.jenkins.phabricator.utils.TestUtils;
-import hudson.model.FreeStyleBuild;
-import hudson.model.Result;
-import org.junit.Before;
-import org.junit.Test;
+import hudson.Extension;
+import hudson.model.AbstractDescribableImpl;
+import hudson.model.Descriptor;
+import org.kohsuke.stapler.DataBoundConstructor;
 
-import java.io.IOException;
+public class DirectoryMapping extends AbstractDescribableImpl<DirectoryMapping> {
+    public final String from;
+    public final String to;
 
-public class PhabricatorBuildWrapperTest extends BuildIntegrationTest {
-    private PhabricatorBuildWrapper wrapper;
-
-    @Before
-    public void setUp() throws IOException {
-        p = createProject();
-        wrapper = new PhabricatorBuildWrapper(
-                false,
-                false,
-                false,
-                true,
-                null,
-                TestUtils.getDefaultDirectoryMapping()
-        );
+    @DataBoundConstructor
+    public DirectoryMapping(String from, String to) {
+        this.from = from;
+        this.to = to;
     }
 
-    @Test
-    public void testNoParameterBuild() throws Exception {
-        p.getBuildWrappersList().add(wrapper);
-
-        FreeStyleBuild build = p.scheduleBuild2(0).get();
-        Result result = build.getResult();
-        assertSuccessfulBuild(result);
+    @Extension
+    public static class DescriptorImpl extends Descriptor<DirectoryMapping> {
+        public String getDisplayName() {
+            return "Directory mapping";
+        }
     }
 }

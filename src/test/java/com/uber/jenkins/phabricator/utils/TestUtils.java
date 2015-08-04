@@ -21,6 +21,7 @@
 package com.uber.jenkins.phabricator.utils;
 
 import com.uber.jenkins.phabricator.CodeCoverageMetrics;
+import com.uber.jenkins.phabricator.DirectoryMapping;
 import com.uber.jenkins.phabricator.LauncherFactory;
 import com.uber.jenkins.phabricator.conduit.DifferentialClient;
 import com.uber.jenkins.phabricator.uberalls.UberallsClient;
@@ -37,6 +38,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -136,5 +139,9 @@ public class TestUtils {
             Ratio ratio = Ratio.create(value * 100.0f, 100.0f);
             when(coverageResult.getCoverage(coverageMetric)).thenReturn(ratio);
         }
+    }
+
+    public static List<DirectoryMapping> getDefaultDirectoryMapping() {
+        return new ArrayList<DirectoryMapping>();
     }
 }

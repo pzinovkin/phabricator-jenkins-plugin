@@ -26,12 +26,16 @@ import hudson.tasks.BuildWrapperDescriptor;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
 
+import java.util.List;
+
 @SuppressWarnings("UnusedDeclaration")
 @Extension
 public final class PhabricatorBuildWrapperDescriptor extends BuildWrapperDescriptor {
     private String conduitURL;
     private String conduitToken;
     private String arcPath;
+    private String subdirParameter;
+    private List<DirectoryMapping> subdirMap;
 
     public PhabricatorBuildWrapperDescriptor() {
         super(PhabricatorBuildWrapper.class);
@@ -56,7 +60,7 @@ public final class PhabricatorBuildWrapperDescriptor extends BuildWrapperDescrip
         // set that to properties and call save().
         req.bindJSON(this, formData.getJSONObject("phabricator"));
         save();
-        return super.configure(req,formData);
+        return super.configure(req, formData);
     }
 
     public String getConduitURL() {
@@ -81,5 +85,21 @@ public final class PhabricatorBuildWrapperDescriptor extends BuildWrapperDescrip
 
     public void setArcPath(String arcPath) {
         this.arcPath = arcPath;
+    }
+
+    public String getSubdirParameter() {
+        return subdirParameter;
+    }
+
+    public void setSubdirParameter(String subdirParameter) {
+        this.subdirParameter = subdirParameter;
+    }
+
+    public List<DirectoryMapping> getSubdirMap() {
+        return subdirMap;
+    }
+
+    public void setSubdirMap(List<DirectoryMapping> subdirMap) {
+        this.subdirMap = subdirMap;
     }
 }
