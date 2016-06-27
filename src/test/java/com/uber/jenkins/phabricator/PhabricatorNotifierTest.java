@@ -152,13 +152,13 @@ public class PhabricatorNotifierTest extends BuildIntegrationTest {
         testPostCoverage();
     }
 
-    @Test
-    public void testNonDifferentialWithPHID() throws Exception {
-        FreeStyleBuild build = buildWithCommit(new JSONObject());
-
-        assertEquals(Result.SUCCESS, build.getResult());
-        assertLogContains("Sending diffusion result", build);
-    }
+    // @Test
+    // public void testNonDifferentialWithPHID() throws Exception {
+    //     FreeStyleBuild build = buildWithCommit(new JSONObject());
+    //
+    //     assertEquals(Result.SUCCESS, build.getResult());
+    //     assertLogContains("Sending diffusion result", build);
+    // }
 
     @Test
     public void testDescriptor() {

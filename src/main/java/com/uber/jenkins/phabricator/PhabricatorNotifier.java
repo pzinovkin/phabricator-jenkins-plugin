@@ -111,7 +111,9 @@ public class PhabricatorNotifier extends Notifier {
         // a Harbormaster build on a commit rather than a differential, but still wants build status.
         // If DIFF_ID is present but PHID is not, it means somebody is doing a Differential build without Harbormaster.
         // So only skip build result processing if both are blank (e.g. master runs to update coverage data)
-        if (CommonUtils.isBlank(phid) && !isDifferential) {
+        // Removed CommonUtils.isBlank(phid) so we can report on Harbormaster build without diffID.
+        // if (CommonUtils.isBlank(phid) && !isDifferential) {
+        if (!isDifferential) {
             if (needsDecoration) {
                 build.addAction(PhabricatorPostbuildAction.createShortText(branch, null));
             }
